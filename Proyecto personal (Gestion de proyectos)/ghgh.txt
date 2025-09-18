@@ -1,0 +1,23 @@
+   //imprimimos la información
+
+    public void datos_tarea (){
+        System.out.println("El id de su tarea es: " + idTarea);
+        System.out.println("El nombre de su tarea es: " + nombreTarea);
+        System.out.println("La descripcion de su tarea es: " + descripcion);
+        System.out.println("La fecha de vencimiento de su tarea es: " + fechaVencimiento);
+    }
+
+public void datos_rol (){
+        System.out.println("El id de su rol es: " + idRol);
+        System.out.println("El nombre de su rol es: " + nombreRol);
+        System.out.println("El permiso de su rol es: " + permisos);
+    }
+
+  //Imprimimos la información
+
+    public void datos_usuario (){
+        System.out.println("El id de su usuario es: " + idUsuario);
+        System.out.println("El nombre de su usuario es: " + nombre);
+        System.out.println("El correo de su usuario es: " + correoElectronico);
+        System.out.println("El rol de su usuario es: " + rol);
+    }

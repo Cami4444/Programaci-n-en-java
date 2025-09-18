@@ -1,0 +1,330 @@
+//imprimimos la información
+
+    public void datos_proyecto (){
+        System.out.println("El numero de su proyecto es:" + idProyecto);
+        System.out.println("El nombre de su proyecto:" + nombreProyecto);
+        System.out.println("La descripcion de su proyecto es:" + descripcion);
+        System.out.println("La fecha de inicio de su proyecto es:" + fechaInicio);
+        System.out.println("La fecha de finalización de su proyecto es:" + fechaFin);
+        System.out.println("El estado de su proyecto es:" + estado);
+    }
+
+
+
+public void activo(){ 
+        System.out.println(nombreProyecto + "esta activo");
+    }
+
+    public void completado(){ 
+        System.out.println(nombreProyecto + "esta completo");
+    }
+
+    public void pausa(){ 
+        System.out.println(nombreProyecto + "esta en pausa");
+    }
+
+
+//todo el codigo
+
+
+
+import java.util.Date;
+import java.util.List;
+import java.util.ArrayList;
+
+public class Proyecto{
+
+    //colocamos los atributos
+
+    int idProyecto;
+    String nombreProyecto;
+    String descripcion;
+    Date fechaInicio;
+    Date fechaFin;
+    EstadoProyecto estado; 
+    List<Tarea> tareas;
+    
+    public Proyecto(int idProyecto, String nombreProyecto, String descripcion, Date fecha_inicio, Date fecha_fin, EstadoProyecto estado){
+        this.idProyecto = idProyecto;
+        this.nombreProyecto = nombreProyecto;
+        this.descripcion = descripcion;
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin;
+        this.estado = estado;
+        this.tareas = new ArrayList<>();
+    }
+
+    public void agregarTarea(Tarea tarea) {
+        tareas.add(tarea);
+    }
+
+    public void removerTarea(Tarea tarea) {
+        tareas.remove(tarea);
+    }
+
+    public List<Tarea> obtenerTareas() {
+        return tareas;
+    }
+
+    //aplicamos el método getter and setter
+
+    public int getidProyecto(){
+        return idProyecto; 
+    }
+    public void setidProyecto(int idProyecto) { 
+        this.idProyecto = idProyecto; 
+    }
+
+    public String getnombreProyecto(){
+        return nombreProyecto; 
+    }
+    public void setnombreProyecto(String nombreProyecto){ 
+        this.nombreProyecto = nombreProyecto; 
+    }
+
+    public String descripcion(){
+        return descripcion; 
+    }
+    public void descripcion(String descripcion){ 
+        this.descripcion = descripcion; 
+    }
+
+    public Date fechaInicio(){
+        return fechaInicio; 
+    }
+    public void fechaInicio(Date fechaInicio){ 
+        this.fechaInicio = fechaInicio; 
+    }
+
+    public Date fechaFin(){
+        return fechaFin; 
+    }
+    public void fechaFin(Date fechaFin){ 
+        this.fechaFin = fechaFin; 
+    }
+
+    public EstadoProyecto getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoProyecto estado) {
+        this.estado = estado;
+    }
+}   
+    public enum EstadoProyecto {
+        ACTIVO,
+        COMPLETADO,
+        EN_PAUSA
+    }
+    //Colocamos la clase tarea
+
+    public class Tarea{
+
+        //colocamos los atributos
+    
+        int idTarea;
+        String nombreTarea;
+        String descripcion;
+        EstadoTarea estadoTarea;
+        Prioridad prioridad;
+        Date fechaVencimiento;
+    
+        public Tarea (int idTarea,String nombreTarea, String descripcion, EstadoTarea estadoTarea, Prioridad prioridad, Date fechaVencimiento){
+            this.idTarea = idTarea;
+            this.nombreTarea = nombreTarea;
+            this.descripcion = descripcion;
+            this.estadoTarea = estadoTarea;
+            this.prioridad = prioridad;
+            this.fechaVencimiento = fechaVencimiento;
+        }
+    
+        //aplicamos métodos getter and setter
+    
+        public int getidTarea(){
+            return idTarea; 
+        }
+        public void setidTarea(int idTarea) { 
+            this.idTarea = idTarea; 
+        }
+    
+        public String getnombreTarea(){
+            return nombreTarea; 
+        }
+        public void setnombreTarea(String nombreTarea) { 
+            this.nombreTarea = nombreTarea; 
+        }
+    
+        public String getdescripcion(){
+            return descripcion; 
+        }
+        public void setdescripcion(String descripcion) { 
+            this.descripcion = descripcion;
+        }
+    
+        public EstadoTarea getestadoTarea(){
+            return estadoTarea; 
+        }
+        public void setestadoTarea(EstadoTarea estadoTarea) { 
+            this.estadoTarea = estadoTarea; 
+        }
+    
+        public Prioridad getprioridad(){
+            return prioridad; 
+        }
+        public void setprioridad(Prioridad prioridad) { 
+            this.prioridad = prioridad; 
+        }
+    
+        public Date getfechaVencimiento(){
+            return fechaVencimiento; 
+        }
+        public void setfechaVencimiento(Date fechaVencimiento) { 
+            this.fechaVencimiento = fechaVencimiento; 
+        }
+
+        public void pendiente(){ 
+            System.out.println(nombreTarea + "esta pendiente");
+        }
+
+        public void en_progreso(){ 
+            System.out.println(nombreTarea + "esta en progreso");
+        }
+
+        public void completado(){ 
+            System.out.println(nombreTarea + "esta en completo");
+        }
+
+        public void alta(){ 
+            System.out.println(nombreTarea + "es de alta prioridad");
+        }
+
+        public void media(){ 
+            System.out.println(nombreTarea + "es de media prioridad");
+        }
+
+        public void baja(){ 
+            System.out.println(nombreTarea + "es de baja prioridad");
+        }
+
+    }
+
+    public enum EstadoTarea {
+        PENDIENTE,
+        EN_PROGRESO,
+        COMPLETADA
+    }
+
+    public enum Prioridad {
+        ALTA,
+        MEDIA,
+        BAJA
+    }
+
+    //colocamos la clase de usuario
+
+    public class Usuario{
+
+        //colocamos los atributos
+        
+        int idUsuario;
+        String nombre;
+        String correoElectronico;
+        Rol rol;
+    
+        public Usuario(int idUsuario, String nombre, String correoElectronico, Rol rol){
+            this.idUsuario = idUsuario;
+            this.nombre = nombre;
+            this.correoElectronico = correoElectronico;
+            this.rol = rol;
+        }
+    
+        //aplicando getter y setter
+    
+        public int getidUsuario(){
+            return idUsuario; 
+        }
+        public void setidUsuario(int idUsuario) { 
+            this.idUsuario = idUsuario; 
+        }
+    
+        public String getnombre(){
+            return nombre; 
+        }
+        public void setnombre(String nombre) { 
+            this.nombre = nombre; 
+        }
+    
+        public String getcorreoElectronico(){
+            return correoElectronico; 
+        }
+        public void setcorreoElectronico(String correoElectrónico) { 
+            this.correoElectronico = correoElectrónico; 
+        }
+    
+        public Rol getrol(){
+            return rol; 
+        }
+        public void setrol(Rol rol) { 
+            this.rol = rol; 
+        }
+    }
+    public class Rol{
+
+        //Colocamos los atributos
+    
+        int idRol;
+        String nombreRol;
+        String permisos; 
+    
+        public Rol (int idRol, String nombreRol, String permisos){
+            this.idRol=idRol;
+            this.nombreRol=nombreRol;
+            this.permisos=permisos;
+        }
+    
+        //Aplicamos getter y setter
+    
+        public int getidRol(){
+            return idRol; 
+        }
+        public void setidRol(int idRol) { 
+            this.idRol = idRol; 
+        }
+    
+        public String getnombreRol(){
+            return nombreRol; 
+        }
+        public void setnombreRol(String nombreRol) { 
+            this.nombreRol = nombreRol; 
+        }
+    
+        public String getpermisos(){
+            return permisos; 
+        }
+        public void setpermisos(String permisos) { 
+            this.permisos = permisos; 
+        }
+    
+    }
+    public static void main(String[] args){
+
+        Proyecto proyecto1 = new Proyecto (1,"proyecto1", "Descripcion del proyecto", new Date(), new Date(), EstadoProyecto.EN_PAUSA);
+        Tarea tarea1 = new Tarea(1, "Tarea 1", "Descripción de la Tarea 1", EstadoTarea.PENDIENTE, Prioridad.ALTA, new Date());
+        Tarea tarea2 = new Tarea(2, "Tarea 1", "Descripción de la Tarea 2", EstadoTarea.COMPLETADA, Prioridad.BAJA, new Date());
+        Rol rolAdmin = new Rol(1, "Administrador", "Permisos de administrador");
+        Rol rolDesarrollador = new Rol(2, "Desarrollador", "Permisos de desarrollador");
+        Usuario usuario1 = new Usuario(19201656, "Edgar Smith", "edgarsmith@gmail.com", rolAdmin);
+        Usuario usuario2 = new Usuario(20564856, "Alicia Polo", "alicepolo@gmail.com", rolDesarrollador);
+        
+    
+        proyecto1.agregarTarea(tarea1);
+        proyecto1.agregarTarea(tarea2);
+
+        System.out.println("Proyecto: " + proyecto1.getnombreProyecto());
+        System.out.println("Estado: " + proyecto1.getEstado());
+        System.out.println("Tareas:");
+
+        for (Tarea tarea : proyecto1.obtenerTareas()) {
+            System.out.println("- " + tarea.getnombreTarea() + " (" + tarea.getestadoTarea() + ")");
+        }
+    }

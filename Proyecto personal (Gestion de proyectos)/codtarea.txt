@@ -1,0 +1,422 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
+ */
+package com.hah.controlador;
+
+import com.hah.modelo.Vehiculo;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Pane;
+import org.bson.Document;
+
+/**
+ * FXML Controller class
+ *
+ * @author MEGAPC
+ */
+public class VentanaController implements Initializable {
+
+    @FXML
+    private Button btn_añadir;
+
+    @FXML
+    private Button btn_buscar;
+
+    @FXML
+    private Button btn_editar;
+
+    @FXML
+    private Button btn_eliminar;
+
+    @FXML
+    private TableColumn<Vehiculo,String> clmcolor;
+
+    @FXML
+    private TableColumn<Vehiculo,Integer> clmplaca;
+
+    @FXML
+    private TableColumn<Vehiculo,String> clmpropietario;
+    
+    @FXML
+    private TableView<Vehiculo> tblVehiculo;
+
+    @FXML
+    private Pane tblregistro;
+
+    @FXML
+    private TextField txt_buscar;
+
+    @FXML
+    private TextField txt_color;
+
+    @FXML
+    private TextField txt_placa;
+
+    @FXML
+    private TextField txt_propietario;
+    
+     // Añadir el TableView
+
+    private ObservableList<Vehiculo> listaVehiculos;
+    
+
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        
+        
+        
+        clmplaca.setCellValueFactory(new PropertyValueFactory<>("placa"));
+        clmcolor.setCellValueFactory(new PropertyValueFactory<>("color"));
+        clmpropietario.setCellValueFactory(new PropertyValueFactory<>("propietario"));
+        
+        
+        btn_añadir.setOnAction(this::añadirVehiculo);
+        btn_eliminar.setOnAction(this::eliminarVehiculo);
+        
+        // Inicializar la lista observable
+        listaVehiculos = FXCollections.observableArrayList();
+        cargarVehiculos();
+        tblVehiculo.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        if (newValue != null) {
+            cargarDatosVehiculo(newValue);
+        }
+    });
+        }
+/**
+ *
+ * @author MEGAPC
+ */
+    
+    
+private void cargarVehiculos() {
+    // Limpiar la lista actual
+    listaVehiculos.clear();
+
+    // Conectar con la base de datos
+    MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
+    MongoDatabase database = mongoClient.getDatabase("parqueaderoDB");
+    MongoCollection<Document> collection = database.getCollection("vehiculos");
+    
+    
+    // Obtener todos los documentos de la colección
+    FindIterable<Document> documentos = collection.find();
+    
+    List<Vehiculo> vehiculos = new ArrayList<>();
+    // Iterar sobre los documentos y agregar los vehículos a la lista
+    for (Document doc : documentos) {
+        int placa = doc.getInteger("placa");
+        String color = doc.getString("color");
+        String propietario = doc.getString("propietario");
+        
+        vehiculos.add(new Vehiculo(placa, color, propietario));
+
+        Vehiculo vehiculo = new Vehiculo(placa, color, propietario);
+        listaVehiculos.add(vehiculo);
+    }
+
+    // Asignar la lista a la tabla (esto ya se hace en el `initialize`, pero se puede asegurar aquí)
+    tblVehiculo.setItems(listaVehiculos);
+}
+
+
+    
+    @FXML
+void añadirVehiculo(ActionEvent event) {
+    // Crear un nuevo vehículo a partir de los datos de los TextFields
+    int placa = Integer.parseInt(txt_placa.getText());
+    String color = txt_color.getText();
+    String propietario = txt_propietario.getText();
+
+    Vehiculo nuevoVehiculo = new Vehiculo(placa, color, propietario);
+
+    // Añadir el vehículo a la base de datos
+    añadirVehiculoDB(nuevoVehiculo);
+
+    // Añadir el vehículo a la lista observable y limpiar los campos
+
+    limpiarCampos();
+    cargarVehiculos();
+}
+private void añadirVehiculoDB(Vehiculo vehiculo) {
+    MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
+    MongoDatabase database = mongoClient.getDatabase("parqueaderoDB");
+    MongoCollection<Document> collection = database.getCollection("vehiculos");
+
+    Document documento = new Document("placa", vehiculo.getPlaca())
+                                .append("color", vehiculo.getColor())
+                                .append("propietario", vehiculo.getPropietario());
+    
+    collection.insertOne(documento);
+}
+
+@FXML
+private void eliminarVehiculo(ActionEvent event) {
+    // Obtener el vehículo seleccionado en la tabla
+    Vehiculo vehiculoSeleccionado = tblVehiculo.getSelectionModel().getSelectedItem();
+
+    if (vehiculoSeleccionado != null) {
+        // Eliminar de la base de datos
+        eliminarVehiculoDB(vehiculoSeleccionado);
+
+        // Eliminar de la lista observable
+        listaVehiculos.remove(vehiculoSeleccionado);
+    } else {
+        // Mostrar un mensaje de error si no se seleccionó un vehículo
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setContentText("Por favor, selecciona un vehículo para eliminar.");
+        alert.show();
+    }
+    cargarVehiculos();
+}
+private void eliminarVehiculoDB(Vehiculo vehiculo) {
+    MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
+    MongoDatabase database = mongoClient.getDatabase("parqueaderoDB");
+    MongoCollection<Document> collection = database.getCollection("vehiculos");
+
+    Document query = new Document("placa", vehiculo.getPlaca());
+    collection.deleteOne(query);
+}
+
+@FXML
+private void seleccionarVehiculo() {
+    // Obtener el vehículo seleccionado en la tabla
+    Vehiculo vehiculoSeleccionado = tblVehiculo.getSelectionModel().getSelectedItem();
+
+    if (vehiculoSeleccionado != null) {
+        // Llenar los campos de texto con los datos del vehículo seleccionado
+        txt_placa.setText(String.valueOf(vehiculoSeleccionado.getPlaca()));
+        txt_color.setText(vehiculoSeleccionado.getColor());
+        txt_propietario.setText(vehiculoSeleccionado.getPropietario());
+    }
+    tblVehiculo.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+    seleccionarVehiculo();
+});
+
+}
+
+private void cargarDatosVehiculo(Vehiculo vehiculo) {
+     
+    txt_placa.setText(String.valueOf(vehiculo.getPlaca()));
+    txt_color.setText(vehiculo.getColor());
+    txt_propietario.setText(vehiculo.getPropietario());
+   
+}
+
+@FXML
+private void editarVehiculo(ActionEvent event) {
+    // Obtener el vehículo seleccionado
+    Vehiculo vehiculoSeleccionado = tblVehiculo.getSelectionModel().getSelectedItem();
+
+    if (vehiculoSeleccionado != null) {
+        // Obtener los nuevos valores desde los campos de texto
+        int placa = Integer.parseInt(txt_placa.getText());
+        String nuevoColor = txt_color.getText();
+        String nuevoPropietario = txt_propietario.getText();
+
+        // Conectar a MongoDB
+        MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
+        MongoDatabase database = mongoClient.getDatabase("parqueaderoDB");
+        MongoCollection<Document> collection = database.getCollection("vehiculos");
+
+        // Crear el filtro para encontrar el documento con la placa específica
+        Document filtro = new Document("placa", vehiculoSeleccionado.getPlaca());
+
+        // Crear el documento con los nuevos datos
+        Document nuevosDatos = new Document()
+                .append("color", nuevoColor)
+                .append("propietario", nuevoPropietario);
+
+        // Crear el documento de actualización
+        Document actualizacion = new Document("$set", nuevosDatos);
+
+        // Realizar la actualización
+        collection.updateOne(filtro, actualizacion);
+
+        // Mostrar un mensaje de confirmación
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setContentText("El vehículo con la placa " + placa + " ha sido actualizado exitosamente.");
+        alert.show();
+
+        // Recargar la tabla para reflejar los cambios
+        cargarVehiculos();
+    } else {
+        // Mostrar un mensaje de advertencia si no se selecciona ningún vehículo
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setContentText("Por favor, seleccione un vehículo en la tabla para editar.");
+        alert.show();
+    }
+}
+
+
+
+
+@FXML
+private void buscarVehiculo(ActionEvent event) {
+    // Obtener la placa desde el campo de texto
+    String placaBusquedaStr = txt_buscar.getText();
+
+    // Convertir la placa a int
+    int placaBusqueda = Integer.parseInt(placaBusquedaStr);
+
+    // Conectar a MongoDB
+    MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
+    MongoDatabase database = mongoClient.getDatabase("parqueaderoDB");
+    MongoCollection<Document> collection = database.getCollection("vehiculos");
+
+    // Crear el filtro para buscar el vehículo por placa
+    Document filtro = new Document("placa", placaBusqueda);
+
+    // Buscar el vehículo en la base de datos
+    Document resultado = collection.find(filtro).first();
+
+    if (resultado != null) {
+        // Si se encuentra el vehículo, llenar los campos de texto con sus datos
+        txt_placa.setText(String.valueOf(resultado.getInteger("placa")));
+        txt_color.setText(resultado.getString("color"));
+        txt_propietario.setText(resultado.getString("propietario"));
+
+        // Actualizar la tabla para mostrar solo ese vehículo
+        listaVehiculos.clear();
+        Vehiculo vehiculo = new Vehiculo(
+            resultado.getInteger("placa"),
+            resultado.getString("color"),
+            resultado.getString("propietario")
+        );
+        listaVehiculos.add(vehiculo);
+        tblVehiculo.setItems(listaVehiculos);
+
+        // Limpiar la tabla si no hay resultados
+        listaVehiculos.clear();
+    }
+}
+
+
+private void limpiarCampos() {
+    txt_placa.clear();
+    txt_color.clear();
+    txt_propietario.clear();
+}
+
+
+    @FXML
+    void click(ActionEvent event) {
+
+    }
+    
+
+}
+ 
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+public void eliminarVehiculo(int placa) {
+        Document query = new Document("placa", placa);
+        collection.deleteOne(query);
+        System.out.println("Vehículo con placa " + placa + " eliminado.");
+    }
+    
+
+public void editarVehiculo(int placa, String nuevoColor, String nuevoPropietario) {
+        Document query = new Document("placa", placa);
+        
+        Document newValues = new Document();
+        newValues.append("color", nuevoColor);
+        newValues.append("propietario", nuevoPropietario);
+        
+        Document updateOperation = new Document("$set", newValues);
+        
+        collection.updateOne(query, updateOperation);
+        System.out.println("Vehículo con placa " + placa + " actualizado.");
+    }
+    
+    
+
+public List<Vehiculo> listarVehiculos() {
+        List<Vehiculo> listaVehiculos = new ArrayList<>();
+        FindIterable<Document> documentos = collection.find();
+        
+        for (Document doc : documentos) {
+            Vehiculo vehiculo = new Vehiculo(
+                doc.getInteger("placa"),
+                doc.getString("color"),
+                doc.getString("propietario")
+            );
+            listaVehiculos.add(vehiculo);
+        }
+        
+        return listaVehiculos;
+    }
